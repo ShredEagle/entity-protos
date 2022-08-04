@@ -2,6 +2,13 @@ set(TARGET_NAME bawls)
 
 set(${TARGET_NAME}_HEADERS
     Bawls.h
+    Timer.h
+
+    ComponentGeometry.h
+    ComponentVelocity.h
+
+    SystemMove.h
+    SystemRender.h
 )
 
 set(${TARGET_NAME}_SOURCES
