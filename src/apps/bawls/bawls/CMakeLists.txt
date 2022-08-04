@@ -7,6 +7,7 @@ set(${TARGET_NAME}_HEADERS
     ComponentGeometry.h
     ComponentVelocity.h
 
+    SystemCollide.h
     SystemMove.h
     SystemRender.h
 )

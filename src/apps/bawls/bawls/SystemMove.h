@@ -28,7 +28,6 @@ public:
 
                 // Window border bounce
                 math::Vec<2, GLfloat> radiusVec{aGeometry.radius, aGeometry.radius};
-                radiusVec /= 2.f;
 
                 // One each dimension: 
                 // the signed value of the overflow, or zero if there is none.

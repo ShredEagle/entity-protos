@@ -39,6 +39,7 @@ Bawls::Bawls(const ad::graphics::AppInterface & aAppInterface) :
     mWindowSize_world{
         getWindowSizeInWorld(aAppInterface.getWindowSize(), gWindowHeight_world)},
     mMoveSystem{mWorld, math::Rectangle<GLfloat>{{0.f, 0.f}, mWindowSize_world}.centered()},
+    mCollideSystem{mWorld},
     mRenderSystem{mWorld}
 {
     constexpr GLfloat gWindowHeight_world = 10;
@@ -46,11 +47,11 @@ Bawls::Bawls(const ad::graphics::AppInterface & aAppInterface) :
 
     ent::Phase prepopulate;
     mWorld.addEntity().get(prepopulate)
-        ->add<component::Geometry>({.position = {0.f, 0.f}})
+        ->add<component::Geometry>({.position = {0.f, 0.f}, .radius = 2.f})
         .add<component::Velocity>({1.f, 3.f})
         ;
     mWorld.addEntity().get(prepopulate)
-        ->add<component::Geometry>({.position = {3.f, -1.f}})
+        ->add<component::Geometry>({.position = {3.f, -1.f}, .radius = 0.5f})
         .add<component::Velocity>({1.2f, -3.5f})
         ;
     mWorld.addEntity().get(prepopulate)
@@ -63,6 +64,7 @@ Bawls::Bawls(const ad::graphics::AppInterface & aAppInterface) :
 void Bawls::update(float aDelta)
 {
     mMoveSystem.update(aDelta);
+    mCollideSystem.update();
     mRenderSystem.update();
 }
 

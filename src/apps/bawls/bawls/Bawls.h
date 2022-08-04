@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SystemCollide.h"
 #include "SystemMove.h"
 #include "SystemRender.h"
 
@@ -26,6 +27,7 @@ private:
 
     // TODO replace with handles
     system::Move mMoveSystem;
+    system::Collide mCollideSystem;
     system::Render mRenderSystem;
 };
 

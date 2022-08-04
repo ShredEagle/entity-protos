@@ -23,7 +23,7 @@ public:
         std::vector<graphics::r2d::Shaping::Circle> balls;
         mRenderables.each([&balls](component::Geometry & aGeometry)
             {
-                balls.push_back({math::Position<3, GLfloat>{aGeometry.position, 0.f}});
+                balls.push_back({math::Position<3, GLfloat>{aGeometry.position, 0.f}, aGeometry.radius});
             });
         mBalls.resetCircles(balls);
     }
