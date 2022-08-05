@@ -8,19 +8,33 @@ namespace ad {
 
 class Timer
 {
-    using Clock_t = std::chrono::high_resolution_clock;
+    using Clock = std::chrono::high_resolution_clock;
 
 public:
+    using TimePoint = Clock::time_point;
+
     Timer() :
-        mTime{Clock_t::now()}
+        mWallTime{Clock::now()},
+        mSimulationTime{mWallTime}
     {}
 
     double mark()
     {
-        auto now = Clock_t::now();
-        mDelta = (now - mTime).count() * gTickPeriod;
-        mTime = now;
+        mWallTime = now();
+        auto newSimulationTime = mWallTime - mCumulativePause;
+        mDelta = (newSimulationTime - mSimulationTime).count() * gTickPeriod;
+        mSimulationTime = newSimulationTime;
         return mDelta;
+    }
+
+    void pause()
+    {
+        mPauseStart = now();
+    }
+
+    void unpause()
+    {
+        mCumulativePause += now() - mPauseStart;
     }
 
     double delta() const
@@ -28,10 +42,27 @@ public:
         return mDelta;
     }
 
+    TimePoint simulationTime() const
+    {
+        return mSimulationTime;
+    }
+
+    TimePoint wallTime() const
+    {
+        return mWallTime;
+    }
 
 private:
-    static constexpr double gTickPeriod{double(Clock_t::period::num) / Clock_t::period::den};
-    std::chrono::time_point<Clock_t> mTime;
+    std::chrono::time_point<Clock> now()
+    {
+        return Clock::now();
+    }
+
+    static constexpr double gTickPeriod{double(Clock::period::num) / Clock::period::den};
+    std::chrono::time_point<Clock> mWallTime;
+    std::chrono::time_point<Clock> mSimulationTime;
+    std::chrono::time_point<Clock> mPauseStart;
+    Clock::duration mCumulativePause{0};
     double mDelta{0.};
 };
 

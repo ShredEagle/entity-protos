@@ -2,6 +2,7 @@ set(TARGET_NAME bawls)
 
 set(${TARGET_NAME}_HEADERS
     Bawls.h
+    CircularBuffer.h
     Timer.h
 
     ComponentGeometry.h

@@ -58,11 +58,16 @@ Bawls::Bawls(const ad::graphics::AppInterface & aAppInterface) :
         ->add<component::Geometry>({.position = {-3.f, 2.f}})
         .add<component::Velocity>({5.5f, 1.0f})
         ;
+    mWorld.addEntity().get(prepopulate)
+        ->add<component::Geometry>({.position = {3.f, 2.f}})
+        .add<component::Velocity>({5.5f, 1.0f})
+        ;
 }
 
 
 void Bawls::update(float aDelta)
 {
+    mHistory.push(Backup{mWorld.saveState()});
     mMoveSystem.update(aDelta);
     mCollideSystem.update();
     mRenderSystem.update();
@@ -72,6 +77,25 @@ void Bawls::update(float aDelta)
 void Bawls::render() const
 {
     mRenderSystem.render(mCameraProjection);
+}
+
+
+void Bawls::redraw()
+{
+    mRenderSystem.update();
+    render();
+}
+
+
+void Bawls::restorePrevious()
+{
+    mWorld.restoreState(mHistory.rewindBounded().state);
+}
+
+
+void Bawls::restoreNext()
+{
+    mWorld.restoreState(mHistory.advanceBounded().state);
 }
 
 

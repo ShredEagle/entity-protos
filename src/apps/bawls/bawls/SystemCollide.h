@@ -28,7 +28,6 @@ public:
         {
             if(float separation = getSeparation(aGeometryA, aGeometryB); separation <= 0.f)
             {
-                std::cerr << "Collided!\n";
                 float massA = aGeometryA.mass();
                 float massB = aGeometryB.mass();
                 //
