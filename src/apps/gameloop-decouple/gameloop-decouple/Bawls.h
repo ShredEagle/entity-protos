@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include "SystemCollide.h"
 #include "SystemMove.h"
 #include "SystemRender.h"
@@ -7,8 +8,6 @@
 #include <entity/EntityManager.h>
 
 #include <graphics/AppInterface.h>
-
-#include <utils/CircularBuffer.h>
 
 
 namespace ad {
@@ -26,11 +25,6 @@ public:
     void update(float aDelta);
     void render() const;
 
-    void redraw();
-
-    void restorePrevious();
-    void restoreNext();
-
 private:
     static constexpr GLfloat gWindowHeight_world = 10;
 
@@ -38,12 +32,9 @@ private:
     math::Size<2, GLfloat> mWindowSize_world;
     graphics::CameraProjection mCameraProjection;
 
-    // TODO replace with handles
     system::Move mMoveSystem;
     system::Collide mCollideSystem;
     system::Render mRenderSystem;
-
-    CircularBuffer<Backup, 512> mHistory;
 };
 
 

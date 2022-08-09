@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+#include <cassert>
+
 
 namespace ad {
 
@@ -23,6 +25,9 @@ public:
         mWallTime = now();
         auto newSimulationTime = mWallTime - mCumulativePause;
         mDelta = (newSimulationTime - mSimulationTime).count() * gTickPeriod;
+        // Catch some drift conditions
+        // (see GEA 3rd p540 8.5.3.1 High-Resolution Clock Drift)
+        assert(mDelta > 0);
         mSimulationTime = newSimulationTime;
         return mDelta;
     }

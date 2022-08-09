@@ -1,7 +1,8 @@
-set(TARGET_NAME bawls)
+set(TARGET_NAME gameloop-decouple)
 
 set(${TARGET_NAME}_HEADERS
     Bawls.h
+    Timing.h
 
     ComponentGeometry.h
     ComponentVelocity.h
@@ -27,7 +28,7 @@ add_executable(${TARGET_NAME}
 ##
 
 find_package(Entity CONFIG REQUIRED COMPONENTS entity)
-find_package(Graphics CONFIG REQUIRED COMPONENTS graphics)
+find_package(Graphics CONFIG REQUIRED COMPONENTS graphics imguiui)
 
 target_link_libraries(${TARGET_NAME}
     PRIVATE
@@ -35,6 +36,7 @@ target_link_libraries(${TARGET_NAME}
 
         ad::entity
         ad::graphics
+        ad::imguiui
 )
 
 set_target_properties(${TARGET_NAME} PROPERTIES

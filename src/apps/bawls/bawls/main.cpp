@@ -1,7 +1,8 @@
 #include "Bawls.h"
-#include "Timer.h"
 
 #include <graphics/ApplicationGlfw.h>
+
+#include <utils/Timer.h>
 
 #include <functional>
 
