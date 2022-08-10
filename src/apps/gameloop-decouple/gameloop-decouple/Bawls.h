@@ -23,7 +23,7 @@ public:
     Bawls(const ad::graphics::AppInterface & aAppInterface);
 
     void update(float aDelta);
-    void render() const;
+    void render();
 
 private:
     static constexpr GLfloat gWindowHeight_world = 10;

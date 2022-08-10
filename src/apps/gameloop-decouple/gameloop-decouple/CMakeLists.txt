@@ -2,6 +2,7 @@ set(TARGET_NAME gameloop-decouple)
 
 set(${TARGET_NAME}_HEADERS
     Bawls.h
+    Metrics.h
     Timing.h
 
     ComponentGeometry.h

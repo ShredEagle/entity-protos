@@ -69,12 +69,12 @@ void Bawls::update(float aDelta)
 {
     mMoveSystem.update(aDelta);
     mCollideSystem.update();
-    mRenderSystem.update();
 }
 
 
-void Bawls::render() const
+void Bawls::render()
 {
+    mRenderSystem.update();
     mRenderSystem.render(mCameraProjection);
 }
 

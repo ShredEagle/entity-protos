@@ -1,4 +1,5 @@
 #include "Bawls.h"
+#include "Metrics.h"
 #include "Timing.h"
 
 #include <graphics/ApplicationGlfw.h>
@@ -12,57 +13,6 @@
 
 /// Test bed to develop a gameloop which allows to decouple update rate from render rate.
 /// Simulates balls bouncing around, with collisions on window borders and between balls.
-
-namespace ad {
-
-struct Metrics
-{
-    struct Entry
-    {
-        std::string present() const
-        {
-            return data.first + " time: " + std::to_string(data.second);
-        }
-
-        std::pair<std::string, double> data;
-    };
-
-    struct [[nodiscard]] Probe
-    {
-        Probe(Entry & aEntry) :
-            entry{aEntry}
-        {}
-
-        ~Probe()
-        {
-            entry.data.second = Timer::now() - start;
-        }
-
-        Entry & entry;
-        TimePoint start{Timer::now()};
-    };
-
-    void clear()
-    {
-        entries.clear();
-    }
-
-    void push(std::string aLabel, double aTime)
-    {
-        entries.push_back({.data = std::make_pair(std::move(aLabel), aTime)});
-    }
-
-    Probe probe(std::string aLabel)
-    {
-        push(std::move(aLabel), -1.);
-        return Probe{entries.back()};
-    }
-
-    std::vector<Entry> entries;
-};
-
-} // namespace ad
-
 struct Game
 {
     Game()
@@ -75,16 +25,18 @@ struct Game
 
     void prepareMenu(const ad::Metrics & aMetrics)
     {
-        ImGui::Begin("Previous frame metrics");
-        for (const auto & entry : aMetrics.entries)
+        ImGui::Begin("Frame metrics");
+        for (const auto & message : aMetrics.messages)
         {
-            ImGui::Text(entry.present().c_str());
+            ImGui::Text(message.c_str());
         }
         ImGui::End();
     }
 
     void run()
     {
+        using ad::Metrics;
+
         static constexpr double gSimulationDelta = 1./100.;
 
         ad::Timer timer;
@@ -102,31 +54,32 @@ struct Game
             //bool b = true;
             //ImGui::ShowDemoWindow(&b);
 
+            metrics.update(frameTime);
             prepareMenu(metrics);
-            metrics.clear();
 
-            // Simuation
+            // Simulation
             {
-                auto probe = metrics.probe("Update");
+                auto probe = metrics.probe(Metrics::Simulation);
                 int steps = 0;
                 while (accumulator >= gSimulationDelta)
                 {
+                    auto probe = metrics.probe(Metrics::Update);
                     scene.update(gSimulationDelta);
                     accumulator -= gSimulationDelta;
                     ++steps;
                 }
-                probe.entry.data.first += std::to_string(steps);
+                metrics.record(Metrics::Steps, steps);
             }
             // Rendering
             {
                 {
-                    auto p = metrics.probe("Render");
+                    auto p = metrics.probe(Metrics::Render);
                     application.getAppInterface()->clear();
                     scene.render();
                 }
                 imgui.render();
                 {
-                    auto probe = metrics.probe("Swap");
+                    auto probe = metrics.probe(Metrics::Swap);
                     application.swapBuffers();
                 }
             }
@@ -135,8 +88,8 @@ struct Game
             frameTime = endFrameTime - currentTime;
             currentTime = endFrameTime;
 
-            metrics.push("Frame", frameTime);
-            metrics.push("FPS", 1/frameTime);
+            metrics.record(Metrics::Frame, frameTime);
+            metrics.record(Metrics::FPS, 1/frameTime);
 
         }
     }
@@ -161,7 +114,7 @@ struct Game
 
 int main()
 {
-    try 
+    try
     {
         Game game;
         game.run();
@@ -169,7 +122,7 @@ int main()
     catch (const std::exception & aException)
     {
         std::cerr << "Exception reached the top level:\n"
-            << aException.what() 
+            << aException.what()
             << std::endl;
         return EXIT_FAILURE;
     }
