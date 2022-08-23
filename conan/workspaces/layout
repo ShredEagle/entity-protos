@@ -2,4 +2,4 @@
 ../
 
 [build_folder]
-../build_ws/{{settings.build_type}}/
+../build/

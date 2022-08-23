@@ -1,0 +1,14 @@
+editables:
+    entity/game2:
+        path: ../../../entity/conan
+    graphics/game2:
+        path: ../../../graphics/conan
+    handy/game2:
+        path: ../../../handy/conan
+    math/game2:
+        path: ../../../math/conan
+    entityprotos/local:
+        path: ../../conan
+layout: layout
+workspace_generator: cmake
+root: entityprotos/local

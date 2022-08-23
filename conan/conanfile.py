@@ -27,6 +27,8 @@ class EntityprotosConan(ConanFile):
     requires = (
         "entity/game2",
         "graphics/game2",
+        "handy/game2",
+        "math/game2",
     )
 
     # Note: It seems conventionnal to add CMake build requirement
