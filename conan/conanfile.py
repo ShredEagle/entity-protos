@@ -1,7 +1,4 @@
-from conans import ConanFile, tools
-from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
-
-from os import path
+from conans import ConanFile
 
 
 class EntityprotosConan(ConanFile):
