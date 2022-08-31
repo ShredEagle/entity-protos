@@ -8,6 +8,13 @@
 
 #include <cstdlib>
 
+#ifdef _WIN32
+#include "ContextWindows.h"
+#endif
+
+
+#define GLFW_WIN_CONTEXT
+
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -24,9 +31,9 @@ struct Game
     {
         glfwInit();
 
+#if defined(GLFW_WIN_CONTEXT)
         // Added from nvpro
         glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-        //glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
@@ -34,17 +41,31 @@ struct Game
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         // macOS requirement (as well as not going above to OpenGL 4.1)
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#else
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+        ContextWindowInternalGL ctx;
+#endif
 
         GLFWwindow * glfwWindow = glfwCreateWindow(gWindowResolution.width(), gWindowResolution.height(),
                                                    gAppName.c_str(), NULL, NULL);
 
         glfwSetKeyCallback(glfwWindow, key_callback);
 
+#if defined(GLFW_WIN_CONTEXT)
         glfwMakeContextCurrent(glfwWindow);
+#else
+        ctx.init(glfwWindow);
+#endif
         gladLoadGL();
 
         // VSync
+#if defined(GLFW_WIN_CONTEXT)
         glfwSwapInterval(1);
+#else
+        ctx.m_wglSwapIntervalEXT(1);
+#endif
+
 
         ad::Bawls scene{gWindowResolution};
 
@@ -86,12 +107,12 @@ struct Game
                     scene.render();
                 }
                 {
-                    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Imgui");
-                    glPopDebugGroup();
-                }
-                {
                     auto probe = metrics.probe(Metrics::Swap);
+#if defined(GLFW_WIN_CONTEXT)
                     glfwSwapBuffers(glfwWindow);
+#else
+                    SwapBuffers(ctx.m_hDC);
+#endif
                 }
             }
 

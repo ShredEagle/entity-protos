@@ -2,6 +2,7 @@ set(TARGET_NAME stutter-investigate)
 
 set(${TARGET_NAME}_HEADERS
     Bawls.h
+    ContextWindows.h
     Metrics.h
     Timing.h
 
