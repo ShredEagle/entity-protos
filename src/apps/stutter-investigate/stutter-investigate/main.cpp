@@ -4,6 +4,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include <nvtx3/nvToolsExt.h>
+
 #include <functional>
 
 #include <cstdlib>
@@ -22,6 +24,23 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
+
+struct RangeNvtx
+{
+    RangeNvtx(const char * aName)
+    {
+        nvtxRangePush(aName);
+    }
+
+    RangeNvtx(const std::string & aName) :
+        RangeNvtx(aName.c_str())
+    {}
+
+    ~RangeNvtx()
+    {
+        nvtxRangePop();
+    }
+};
 
 /// Test bed to develop a gameloop which allows to decouple update rate from render rate.
 /// Simulates balls bouncing around, with collisions on window borders and between balls.
@@ -66,12 +85,9 @@ struct Game
         ctx.m_wglSwapIntervalEXT(1);
 #endif
 
-
         ad::Bawls scene{gWindowResolution};
 
         using ad::Metrics;
-
-        static constexpr double gSimulationDelta = 1./100.;
 
         ad::Timer timer;
         ad::TimePoint currentTime = timer.now();
@@ -82,32 +98,40 @@ struct Game
 
         while(! glfwWindowShouldClose(glfwWindow))
         {
+            RangeNvtx range("Frame");
             accumulator += frameTime;
 
-            metrics.update(frameTime);
+            //metrics.update(frameTime);
 
             // Simulation
             {
-                auto probe = metrics.probe(Metrics::Simulation);
-                int steps = 0;
-                while (accumulator >= gSimulationDelta)
-                {
-                    auto probe = metrics.probe(Metrics::Update);
-                    scene.update(gSimulationDelta);
-                    accumulator -= gSimulationDelta;
-                    ++steps;
-                }
-                metrics.record(Metrics::Steps, steps);
+                RangeNvtx range("Simulation");
+                scene.update(frameTime);
             }
             // Rendering
             {
                 {
+                    RangeNvtx range("Graphics");
                     auto p = metrics.probe(Metrics::Render);
-                    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-                    scene.render();
+                    {
+                        RangeNvtx range("Clear");
+                        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+                        // The way it is done in nvpro samples (does not change the glClear stutter problem though.
+                        GLfloat bgColor[4]{0.2, 0.2, 0.2, 0.0};
+                        glClearBufferfv(GL_COLOR, 0, bgColor);
+                        glClearDepth(1.0);
+                        glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+                        glEnable(GL_DEPTH_TEST);
+                    }
+                    {
+                        RangeNvtx range("Render");
+                        scene.render();
+                    }
                 }
                 {
                     auto probe = metrics.probe(Metrics::Swap);
+                    RangeNvtx range("Swap-call");
 #if defined(GLFW_WIN_CONTEXT)
                     glfwSwapBuffers(glfwWindow);
 #else
