@@ -62,7 +62,7 @@ struct ContextWindowInternalGL
     attribList.push_back(b);                                                                                           \
   }
       int maj = 4;
-      int min = 1;
+      int min = 5;
       ADDATTRIB(WGL_CONTEXT_MAJOR_VERSION_ARB, maj)
       ADDATTRIB(WGL_CONTEXT_MINOR_VERSION_ARB, min)
 
@@ -119,7 +119,8 @@ struct ContextWindowInternalGL
 
     if(!s_module)
     {
-      s_module = LoadLibraryA("opengl32.dll");
+      // Apparently not useful       
+      //s_module = LoadLibraryA("opengl32.dll");
     }
 
     return true;
