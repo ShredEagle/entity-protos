@@ -12,21 +12,21 @@ namespace ad {
 namespace {
 
 
-math::Size<2, GLfloat> getWindowSizeInWorld(math::Size<2, int> aWindowResolution,
-                                            GLfloat aWindowHeight_world)
+math::Size<2, float> getWindowSizeInWorld(math::Size<2, int> aWindowResolution,
+                                            float aWindowHeight_world)
 {
-    GLfloat worldUnitPerPixel = aWindowHeight_world / aWindowResolution.height();
-    return math::Size<2, GLfloat>{aWindowResolution * worldUnitPerPixel};
+    float worldUnitPerPixel = aWindowHeight_world / aWindowResolution.height();
+    return math::Size<2, float>{aWindowResolution * worldUnitPerPixel};
 }
 
 
-auto getProjection(math::Size<2, GLfloat> aWindowSize_world)
+auto getProjection(math::Size<2, float> aWindowSize_world)
 {
-    constexpr GLfloat gFarPlane = 1.f;
+    constexpr float gFarPlane = 1.f;
 
-    return math::trans3d::orthographicProjection<GLfloat>(
-        math::Box<GLfloat>{
-            math::Position<3, GLfloat>::Zero(),
+    return math::trans3d::orthographicProjection<float>(
+        math::Box<float>{
+            math::Position<3, float>::Zero(),
             {aWindowSize_world, 2 * gFarPlane}
         }.centered());
 }
@@ -38,12 +38,14 @@ auto getProjection(math::Size<2, GLfloat> aWindowSize_world)
 Bawls::Bawls(math::Size<2, int> aWindowResolution) :
     mWindowSize_world{
         getWindowSizeInWorld(aWindowResolution, gWindowHeight_world)},
-    mMoveSystem{mWorld, math::Rectangle<GLfloat>{{0.f, 0.f}, mWindowSize_world}.centered()},
+    mMoveSystem{mWorld, math::Rectangle<float>{{0.f, 0.f}, mWindowSize_world}.centered()},
     mCollideSystem{mWorld},
     mRenderSystem{mWorld}
 {
-    constexpr GLfloat gWindowHeight_world = 10;
+    constexpr float gWindowHeight_world = 10;
+#if !defined(NVPRO_GLLOADER)
     mCameraProjection.setCameraTransformation(getProjection(mWindowSize_world));
+#endif
 
     ent::Phase prepopulate;
     mWorld.addEntity().get(prepopulate)
@@ -69,13 +71,6 @@ void Bawls::update(float aDelta)
 {
     mMoveSystem.update(aDelta);
     mCollideSystem.update();
-}
-
-
-void Bawls::render()
-{
-    mRenderSystem.update();
-    mRenderSystem.render(mCameraProjection);
 }
 
 

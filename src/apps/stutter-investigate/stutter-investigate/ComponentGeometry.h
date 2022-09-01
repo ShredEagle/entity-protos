@@ -1,7 +1,5 @@
 #pragma once
 
-#include <renderer/GL_Loader.h>
-
 #include <math/Vector.h>
 
 
@@ -11,8 +9,8 @@ namespace component {
 
 struct Geometry
 {
-    math::Position<2, GLfloat> previousPosition{0.f, 0.f};
-    math::Position<2, GLfloat> position;
+    math::Position<2, float> previousPosition{0.f, 0.f};
+    math::Position<2, float> position;
     float radius{1.f};
 
     float mass() const

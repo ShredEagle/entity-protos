@@ -33,7 +33,7 @@ public:
                 //
                 // Resolve collision
                 //
-                math::UnitVec<2, GLfloat> normal{
+                math::UnitVec<2, float> normal{
                     aGeometryB.position - aGeometryA.position};
 
                 // Impulse

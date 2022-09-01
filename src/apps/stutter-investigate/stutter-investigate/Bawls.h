@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BuildConfig.h"
 
 #include "SystemCollide.h"
 #include "SystemMove.h"
@@ -7,10 +8,9 @@
 
 #include <entity/EntityManager.h>
 
-#include <graphics/AppInterface.h>
-
 
 namespace ad {
+
 
 class Bawls
 {
@@ -23,14 +23,25 @@ public:
     Bawls(math::Size<2, int> aWindowResolution);
 
     void update(float aDelta);
-    void render();
+
+    void render()
+    {
+        mRenderSystem.update();
+#if defined(NVPRO_GLLOADER)
+        mRenderSystem.render();
+#else
+        mRenderSystem.render(mCameraProjection);
+#endif
+    }
 
 private:
-    static constexpr GLfloat gWindowHeight_world = 10;
+    static constexpr float gWindowHeight_world = 10;
 
     ent::EntityManager mWorld;
-    math::Size<2, GLfloat> mWindowSize_world;
+    math::Size<2, float> mWindowSize_world;
+#if !defined(NVPRO_GLLOADER)
     graphics::CameraProjection mCameraProjection;
+#endif
 
     system::Move mMoveSystem;
     system::Collide mCollideSystem;

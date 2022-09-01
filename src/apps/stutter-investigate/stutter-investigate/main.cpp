@@ -1,7 +1,13 @@
+////
+//// Build controls
+//// 
+#include "BuildConfig.h"
+
 #include "Bawls.h"
 #include "Metrics.h"
 #include "Timing.h"
 
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 #include <nvtx3/nvToolsExt.h>
@@ -10,12 +16,13 @@
 
 #include <cstdlib>
 
+
 #ifdef _WIN32
 #include "ContextWindows.h"
 #endif
 
-
-#define GLFW_WIN_CONTEXT
+// Cannot include both glfw and some of the required headers
+#include "GLLoaderFirewall.h"
 
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -42,6 +49,7 @@ struct RangeNvtx
     }
 };
 
+
 /// Test bed to develop a gameloop which allows to decouple update rate from render rate.
 /// Simulates balls bouncing around, with collisions on window borders and between balls.
 struct Game
@@ -66,8 +74,15 @@ struct Game
         ContextWindowInternalGL ctx;
 #endif
 
+#if defined(FULLSCREEN)
+        auto monitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode * videomode = glfwGetVideoMode(monitor);
+        GLFWwindow * glfwWindow = glfwCreateWindow(videomode->width, videomode->height,
+                                                   gAppName.c_str(), monitor, NULL);
+#else
         GLFWwindow * glfwWindow = glfwCreateWindow(gWindowResolution.width(), gWindowResolution.height(),
                                                    gAppName.c_str(), NULL, NULL);
+#endif
 
         glfwSetKeyCallback(glfwWindow, key_callback);
 
@@ -76,7 +91,13 @@ struct Game
 #else
         ctx.init(glfwWindow);
 #endif
+
+#if defined(NVPRO_GLLOADER)
+        myLoadGL();
+#else
         gladLoadGL();
+#endif
+        
 
         // VSync
 #if defined(GLFW_WIN_CONTEXT)
@@ -115,14 +136,28 @@ struct Game
                     auto p = metrics.probe(Metrics::Render);
                     {
                         RangeNvtx range("Clear");
-                        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
+#if defined(NVPRO_CLEAR)
                         // The way it is done in nvpro samples (does not change the glClear stutter problem though.
                         GLfloat bgColor[4]{0.2, 0.2, 0.2, 0.0};
-                        glClearBufferfv(GL_COLOR, 0, bgColor);
-                        glClearDepth(1.0);
-                        glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-                        glEnable(GL_DEPTH_TEST);
+                        {
+                            RangeNvtx range("glClearBufferfv");
+                            glClearBufferfv(GL_COLOR, 0, bgColor);
+                        }
+                        {
+                            RangeNvtx range("glClearDepth");
+                            glClearDepth(1.0);
+                        }
+                        {
+                            RangeNvtx range("glClear");
+                            glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+                        }
+                        {
+                            RangeNvtx range("glEnable(GL_DEPTH_TEST)");
+                            glEnable(GL_DEPTH_TEST);
+                        }
+#else
+                        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+#endif
                     }
                     {
                         RangeNvtx range("Render");

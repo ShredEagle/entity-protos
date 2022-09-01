@@ -2,7 +2,9 @@ set(TARGET_NAME stutter-investigate)
 
 set(${TARGET_NAME}_HEADERS
     Bawls.h
+    BuildConfig.h
     ContextWindows.h
+    GLLoaderFirewall.h
     Metrics.h
     Timing.h
 
@@ -12,11 +14,18 @@ set(${TARGET_NAME}_HEADERS
     SystemCollide.h
     SystemMove.h
     SystemRender.h
+
+    GL/wgl.h
+    GL/glsubset.h
+    nvgl/extensions_gl.hpp
 )
 
 set(${TARGET_NAME}_SOURCES
     Bawls.cpp
+    GLLoaderFirewall.cpp
     main.cpp
+
+    nvgl/extensions_gl.cpp
 )
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR}
@@ -44,6 +53,13 @@ target_link_libraries(${TARGET_NAME}
         ad::graphics
         ad::imguiui
 )
+
+# NVTX header
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    target_include_directories(${TARGET_NAME}
+      PRIVATE "C:/Program Files/NVIDIA Corporation/Nsight Systems 2022.3.4/target-windows-x64/nvtx/include"
+    )
+endif()
 
 set_target_properties(${TARGET_NAME} PROPERTIES
                       VERSION "${${PROJECT_NAME}_VERSION}"

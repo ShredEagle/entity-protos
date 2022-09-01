@@ -3,8 +3,8 @@
 
 #include "Timing.h"
 
+#include <array>
 #include <string>
-#include <vector>
 
 namespace ad {
 

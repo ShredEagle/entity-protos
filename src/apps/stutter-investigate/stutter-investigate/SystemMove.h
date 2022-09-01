@@ -14,7 +14,7 @@ namespace system {
 class Move
 {
 public:
-    Move(ent::EntityManager & aWorld, const math::Rectangle<GLfloat> & mBoundingBox) :
+    Move(ent::EntityManager & aWorld, const math::Rectangle<float> & mBoundingBox) :
         mMovables{aWorld},
         mWorldBounds{mBoundingBox}
     {}
@@ -28,17 +28,17 @@ public:
                 aGeometry.position += aVelocity * aDelta;
 
                 // Window border bounce
-                math::Vec<2, GLfloat> radiusVec{aGeometry.radius, aGeometry.radius};
+                math::Vec<2, float> radiusVec{aGeometry.radius, aGeometry.radius};
 
                 // One each dimension:
                 // the signed value of the overflow, or zero if there is none.
-                math::Vec<2, GLfloat> overflow =
+                math::Vec<2, float> overflow =
                     (max(mWorldBounds.topRight(), aGeometry.position + radiusVec)
                         - mWorldBounds.topRight())
                     + (min(mWorldBounds.bottomLeft(), aGeometry.position - radiusVec)
                         - mWorldBounds.bottomLeft())
                     ;
-                if(overflow != math::Vec<2, GLfloat>::Zero())
+                if(overflow != math::Vec<2, float>::Zero())
                 {
                     aGeometry.position -= overflow;
                     if (overflow.x()) aVelocity.x() *= -1.f;
@@ -48,7 +48,7 @@ public:
     }
 
 private:
-    math::Rectangle<GLfloat> mWorldBounds;
+    math::Rectangle<float> mWorldBounds;
     ent::Query<component::Geometry, component::Velocity> mMovables;
 };
 
