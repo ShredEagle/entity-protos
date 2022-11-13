@@ -30,7 +30,9 @@ public:
 
     void render(const graphics::CameraProjection & aCameraProjection) const
     {
+        glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Frame");
         mShaping.render(mBalls, aCameraProjection);
+        glPopDebugGroup();
     }
 
 private:
