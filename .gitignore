@@ -7,15 +7,21 @@
 /build-*/
 /conan/test_package/build/
 
-# Clang tooling #
-.clangd/
-compile_commands.json
-
-# CMake #
+# CMake
 CMakeUserPresets.json
 
-# Conan #
+# Conan
+# It tends to put those files in the working directory
+conan.lock
+conanbuildinfo.txt
+conaninfo.txt
 graph_info.json
+conan_imports_manifest.txt
+
+# Clang tooling #
+.clangd
+.cache/clangd/
+compile_commands.json
 
 # Vim #
 *.swp

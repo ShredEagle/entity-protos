@@ -22,10 +22,10 @@ class EntityprotosConan(ConanFile):
     }
 
     requires = (
-        "entity/game2",
-        "graphics/game2",
-        "handy/game2",
-        "math/game2",
+        "entity/83e1ade064@adnn/develop",
+        "graphics/aa960a2385@adnn/develop",
+        "handy/acd90c0549@adnn/develop",
+        "math/541fce5f6a@adnn/develop",
     )
 
     # Note: It seems conventionnal to add CMake build requirement
